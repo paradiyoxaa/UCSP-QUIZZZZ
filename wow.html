@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>USCP Notes — Practice Website</title>
+  <style>
+    :root{--accent:#2563eb;--muted:#6b7280;--bg:#f8fafc;--card:#ffffff}
+    html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;color:#111827;background:var(--bg)}
+    .container{max-width:1000px;margin:28px auto;padding:20px}
+    header{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+    header h1{font-size:1.6rem;margin:0}
+    .meta{color:var(--muted);font-size:0.95rem}
+    nav.toc{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 4px 12px rgba(2,6,23,0.06);margin-bottom:18px}
+    nav.toc h2{margin:0 0 10px 0;font-size:1rem}
+    nav.toc ul{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+    nav.toc a{color:var(--accent);text-decoration:none}
+    main .card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(2,6,23,0.06);margin-bottom:18px}
+    .quiz{max-height:600px;overflow-y:auto;padding-right:8px}
+    .quiz h2{margin-top:0}
+    .question{margin-bottom:16px}
+    .question p{margin:0 0 6px 0;font-weight:500}
+    .question label{display:block;margin-bottom:4px;cursor:pointer}
+    .btn{background:var(--accent);color:white;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-weight:500}
+    .btn:hover{opacity:.9}
+    .result{margin-top:12px;font-weight:600}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>USCP Practice Website</h1>
+    </header>
+
+    <main>
+      <section class="card quiz">
+        <h2>Practice Quiz — USCP Notes</h2>
+        <form id="quizForm"></form>
+        <button type="button" class="btn" onclick="checkAnswers()">Check Answers</button>
+        <button type="button" class="btn" onclick="resetQuiz()">Reset</button>
+        <div id="result" class="result"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const questions=[
+      {q:"Who said that the human mind is a 'tabula rasa' or blank slate?",options:["Karl Marx","John Locke","Talcott Parsons","William Wentworth"],answer:"John Locke"},
+      {q:"What does 'tabula rasa' mean in social sciences?",options:["Mind is pre-programmed","Mind is shaped by experience","Mind is unchangeable","Mind is inherited biologically"],answer:"Mind is shaped by experience"},
+      {q:"Which process allows individuals to acquire identities and survival skills in society?",options:["Acculturation","Enculturation","Socialization","Internalization"],answer:"Socialization"},
+      {q:"Political socialization helps citizens…",options:["Learn farming","Function effectively in politics","Reject social rules","Avoid media"],answer:"Function effectively in politics"},
+      {q:"Internalization means…",options:["Rejecting norms","Accepting norms and values as one’s own","Avoiding politics","Copying others without belief"],answer:"Accepting norms and values as one’s own"},
+      {q:"Who stated that inadequate socialization leads to role failure?",options:["John Locke","Talcott Parsons","Emile Durkheim","Robert Merton"],answer:"Talcott Parsons"},
+      {q:"Interpretist view of socialization emphasizes…",options:["Uniform social roles","Interactive process with society","Complete rejection of norms","Government control only"],answer:"Interactive process with society"},
+      {q:"William Wentworth’s synthesized view highlights…",options:["One-way process","Two-way process of individual and society","Only government power","Only family influence"],answer:"Two-way process of individual and society"},
+      {q:"Which aspect of socialization refers to ideas, beliefs, and behavior passed on?",options:["Process","Content","Results","Context"],answer:"Content"},
+      {q:"What is the outcome when individuals begin to practice societal values?",options:["Results","Context","Enculturation","Internalization"],answer:"Results"},
+      {q:"Self-identity is a result of…",options:["Acculturation","Internalization","Socialization","Deviance"],answer:"Socialization"},
+      {q:"Enculturation means…",options:["Being socialized into one’s culture","Joining political groups","Rejecting traditions","Learning biology"],answer:"Being socialized into one’s culture"},
+      {q:"Acculturation refers to…",options:["Learning one’s culture","Assimilation into a non-native culture","Rejecting culture","Losing all identity"],answer:"Assimilation into a non-native culture"},
+      {q:"Which is the primary agent of socialization?",options:["Media","School","Family","Peer group"],answer:"Family"},
+      {q:"Religion influences socialization by…",options:["Providing stability and change","Avoiding norms","Rejecting culture","Limiting all behavior"],answer:"Providing stability and change"},
+      {q:"Which venue is critical for political socialization of youth?",options:["Family","School","Mass Media","Peers"],answer:"School"},
+      {q:"Which type of school provides specialized job training?",options:["Private","Public","Technical-vocational","Alternative"],answer:"Technical-vocational"},
+      {q:"Which type of school uses non-traditional methods for unique learners?",options:["Alternative","Sectarian","Public","Private"],answer:"Alternative"},
+      {q:"What distinguishes sectarian schools?",options:["Government funded","Religious values","Technical training","No religion"],answer:"Religious values"},
+      {q:"The state socializes citizens mainly through…",options:["Religion","Laws and regulations","Media only","Peers"],answer:"Laws and regulations"},
+      {q:"Peer groups are mostly…",options:["Informal and voluntary","Government controlled","Always family only","Mass media"],answer:"Informal and voluntary"},
+      {q:"Which historical event reshaped Filipino values in 1986?",options:["Martial law","First People Power","Second World War","Spanish colonization"],answer:"First People Power"},
+      {q:"Which agent of socialization presents different viewpoints and entertains?",options:["Mass media","Family","Peers","Religion"],answer:"Mass media"},
+      {q:"Pluralist view of media suggests…",options:["Marketplace for debate","Reflects elite bias","Controlled by journalists only","Indoctrinates without choice"],answer:"Marketplace for debate"},
+      {q:"Market view of media suggests…",options:["Reflects elite bias","Presents what public wants","Ignores society","Forces only government ideas"],answer:"Presents what public wants"},
+      {q:"Dominant ideology view traces bias to…",options:["Free debate","Political and social elites","Random events","Journalists only"],answer:"Political and social elites"},
+      {q:"Elite-values view suggests bias comes from…",options:["Media professionals’ personal views","Government only","Public only","Religion"],answer:"Media professionals’ personal views"},
+      {q:"Conformity means…",options:["Altering thoughts/actions to fit society","Rejecting all norms","Deviance","Isolation"],answer:"Altering thoughts/actions to fit society"},
+      {q:"Which type of conformity is outward but disagrees privately?",options:["Identification","Compliance","Internalization","Rebellion"],answer:"Compliance"},
+      {q:"A student joins a club to build relationships. Which conformity type?",options:["Compliance","Identification","Internalization","Deviance"],answer:"Identification"},
+      {q:"When norms are both publicly and internally accepted, it is…",options:["Internalization","Compliance","Deviance","Rebellion"],answer:"Internalization"},
+      {q:"Deviance refers to…",options:["Violating norms","Obeying all rules","Conforming fully","Isolation only"],answer:"Violating norms"},
+      {q:"Durkheim’s term for loss of shared values and ineffective control is…",options:["Anomie","Strain","Deviance","Labeling"],answer:"Anomie"},
+      {q:"Robert Merton’s theory explaining deviance due to gap between goals and means?",options:["Broken windows","Structural strain theory","Control theory","Labeling theory"],answer:"Structural strain theory"},
+      {q:"Which view sees deviance as emerging from subcultures with different values?",options:["Conflict","Subcultural","Labeling","Functionalist"],answer:"Subcultural"},
+      {q:"Symbolic-interactionist view of deviance stresses…",options:["Structures only","Labeling and relationships","Economics only","Biology"],answer:"Labeling and relationships"},
+      {q:"Labeling theory says deviance emerges when…",options:["Biology dictates","Society labels actions as deviant","Government punishes","Peers agree"],answer:"Society labels actions as deviant"},
+      {q:"Conflict perspective sees deviance as…",options:["Reflection of inequality","Result of free choice only","Random acts","Only family issues"],answer:"Reflection of inequality"},
+      {q:"Control theory explains deviance as…",options:["Inadequate social controls","Excessive rules","Labeling only","Religion"],answer:"Inadequate social controls"},
+      {q:"Broken windows theory suggests…",options:["Order discourages deviance","Anomie explains deviance","Elites cause deviance","Biology causes deviance"],answer:"Order discourages deviance"},
+      {q:"Sanctions are…",options:["Rewards/punishments maintaining norms","Religious rituals","Peer rules only","Media ads"],answer:"Rewards/punishments maintaining norms"},
+      {q:"Which is an informal sanction?",options:["Ostracism and stigma","Prison sentence","Fines","Constitution"],answer:"Ostracism and stigma"},
+      {q:"Human dignity means…",options:["Innate right to be respected","Right to wealth","Only political rights","Family traditions"],answer:"Innate right to be respected"},
+      {q:"Human rights are founded on…",options:["Natural rights","Government only","Religion","Culture only"],answer:"Natural rights"},
+      {q:"Characteristic of human rights that says they apply to all humans?",options:["Universal","Indivisible","Absolute","Fundamental"],answer:"Universal"},
+      {q:"Which document was drafted in 1948 recognizing human rights?",options:["UDHR","1987 Constitution","Bill of Rights","Geneva Convention"],answer:"UDHR"},
+      {q:"Which Philippine legal document enumerates citizens’ rights?",options:["1987 Constitution","UDHR","Civil Code","Labor Law"],answer:"1987 Constitution"},
+      {q:"Western values in human rights emphasize…",options:["Individualism","Harmony","Obedience","Collectivism"],answer:"Individualism"},
+      {q:"Asian values in human rights emphasize…",options:["Social harmony and duty","Only money","Free choice","Isolation"],answer:"Social harmony and duty"},
+      // Situational questions
+      {q:"A teen copies fashion trends from peers despite disliking them privately. This is…",options:["Compliance","Identification","Internalization","Deviance"],answer:"Compliance"},
+      {q:"A worker follows company rules because he truly believes they are fair. This is…",options:["Internalization","Compliance","Deviance","Rebellion"],answer:"Internalization"},
+      {q:"A community stops littering after fines are imposed. This is what type of social control?",options:["Informal","Formal","Peer pressure","Religious"],answer:"Formal"},
+      {q:"A child learns values from parents and siblings. Which agent of socialization?",options:["School","Religion","Family","Peers"],answer:"Family"},
+      {q:"A citizen joins protests after watching media coverage. This shows media as…",options:["Source of political socialization","Family agent","Religious influence","Peer identity"],answer:"Source of political socialization"},
+      {q:"Neighbors isolate a member for breaking a norm. What sanction is this?",options:["Stigma","Formal sanction","Religious ritual","Reward"],answer:"Stigma"},
+      {q:"A student learns Catholic values in school. This is a…",options:["Non-sectarian school","Sectarian school","Technical-vocational","Alternative"],answer:"Sectarian school"},
+      {q:"What theory explains why crime rises when broken windows are ignored?",options:["Broken windows theory","Labeling theory","Anomie","Conflict"],answer:"Broken windows theory"}
+    ];
+
+    function renderQuiz(){
+      const form=document.getElementById('quizForm');
+      form.innerHTML='';
+      questions.forEach((qObj,idx)=>{
+        const qDiv=document.createElement('div');
+        qDiv.className='question';
+        const p=document.createElement('p');
+        p.textContent=(idx+1)+'. '+qObj.q;
+        qDiv.appendChild(p);
+        qObj.options.forEach(opt=>{
+          const label=document.createElement('label');
+          const input=document.createElement('input');
+          input.type='radio';
+          input.name='q'+idx;
+          input.value=opt;
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(' '+opt));
+          qDiv.appendChild(label);
+        });
+        form.appendChild(qDiv);
+      });
+    }
+
+    function checkAnswers(){
+      let score=0;
+      questions.forEach((qObj,idx)=>{
+        const ans=document.querySelector('input[name="q'+idx+'"]:checked');
+        if(ans && ans.value===qObj.answer){score++;}
+      });
+      document.getElementById('result').textContent=`You got ${score} / ${questions.length} correct.`;
+    }
+
+    function resetQuiz(){renderQuiz();document.getElementById('result').textContent='';}
+
+    renderQuiz();
+  </script>
+</body>
+</html>
